@@ -1,26 +1,26 @@
 import sys
-from queue import PriorityQueue
 import networkx as nx
 import matplotlib.pyplot as plt
 
 class Grafo:
     def __init__(self, numVertices):
-        self._numVertices = numVertices
-        self.matAdj = [[sys.maxsize if i != j else 0 for j in range(numVertices)] for i in range(numVertices)]
+        self.__numVertices = numVertices
+        self.__matAdj = [[sys.maxsize if i != j else 0 for j in range(numVertices)] for i in range(numVertices)]
 
     @property
     def numVertices(self):
-        return self._numVertices
+        return self.__numVertices
 
-    @numVertices.setter
-    def numVertices(self, numVertices):
-        self._numVertices = numVertices
+    # @numVertices.setter
+    # def numVertices(self, numVertices):
+    #     self.__numVertices = numVertices
 
     def adicionarAresta(self, verticeA, verticeB, peso):
-        self.matAdj[verticeA][verticeB] = peso
+        self.__matAdj[verticeA][verticeB] = peso
+        self.__matAdj[verticeB][verticeA] = peso
     
     def removerAresta(self, verticeA, verticeB):
-        self.matAdj[verticeA][verticeB] = sys.maxsize
+        self.__matAdj[verticeA][verticeB] = sys.maxsize
 
     def dijkstra(self, posicao):
         visitados = [False for _ in range(self.numVertices)]
@@ -34,8 +34,8 @@ class Grafo:
                     verticeAtual = j
             visitados[verticeAtual] = True
             for j in range(self.numVertices):
-                if self.matAdj[verticeAtual][j] != sys.maxsize:
-                    novaDistancia = distancias[verticeAtual] + self.matAdj[verticeAtual][j]
+                if self.__matAdj[verticeAtual][j] != sys.maxsize:
+                    novaDistancia = distancias[verticeAtual] + self.__matAdj[verticeAtual][j]
                     if novaDistancia < distancias[j]:
                         distancias[j] = novaDistancia
         return distancias
@@ -48,21 +48,21 @@ class Grafo:
         for i in range(self.numVertices):
             print(f" {i}: ", end="")
             for j in range(self.numVertices):
-                if (self.matAdj[i][j] == sys.maxsize):
+                if (self.__matAdj[i][j] == sys.maxsize):
                     print(f"{0:>3}", end=" ")
                 else:
-                    print(f"{self.matAdj[i][j]:>3}", end=" ")
+                    print(f"{self.__matAdj[i][j]:>3}", end=" ")
             print("")
 
     def plotarGrafo(self):
         G = nx.Graph()
-        numVertices = len(grafo.matAdj)
+        numVertices = len(grafo.__matAdj)
         numvertices = grafo.numVertices
         G.add_nodes_from(range(numvertices))
 
         for i in range(numvertices):
             for j in range(i + 1, numvertices):
-                weight = grafo.matAdj[i][j]
+                weight = grafo.__matAdj[i][j]
                 if weight != sys.maxsize:
                     G.add_edge(i, j, weight=weight)
 
