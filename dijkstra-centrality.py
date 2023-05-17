@@ -34,7 +34,7 @@ class Grafo:
                     verticeAtual = j
             visitados[verticeAtual] = True
             for j in range(self.numVertices):
-                if self.matAdj[verticeAtual][j] != 0:
+                if self.matAdj[verticeAtual][j] != sys.maxsize:
                     novaDistancia = distancias[verticeAtual] + self.matAdj[verticeAtual][j]
                     if novaDistancia < distancias[j]:
                         distancias[j] = novaDistancia
