@@ -26,6 +26,8 @@ class Grafo:
         visitados = [False for _ in range(self.numVertices)]
         distancias = [float('inf') for _ in range(self.numVertices)]
         distancias[posicao] = 0
+        caminhoMinimo = [999 for _ in range(self.numVertices)]
+        caminhoMinimo[0] = posicao
 
         for i in range(self.numVertices):
             verticeAtual = -1
@@ -37,8 +39,10 @@ class Grafo:
                 if self.__matAdj[verticeAtual][j] != sys.maxsize:
                     novaDistancia = distancias[verticeAtual] + self.__matAdj[verticeAtual][j]
                     if novaDistancia < distancias[j]:
+                        if j < caminhoMinimo[i + 1] or novaDistancia < distancias[caminhoMinimo[i + 1]]:
+                            caminhoMinimo[i + 1] = j
                         distancias[j] = novaDistancia
-        return distancias
+        return distancias, caminhoMinimo
 
     def mostraGrafo(self):
         print("    ", end="")
@@ -73,8 +77,6 @@ class Grafo:
         plt.axis('off')
         plt.show()
 
-
-
 grafo = Grafo(5)
 grafo.adicionarAresta(0, 1, 4)
 grafo.adicionarAresta(0, 2, 1)
@@ -83,7 +85,10 @@ grafo.adicionarAresta(2, 1, 2)
 grafo.adicionarAresta(2, 3, 5)
 grafo.adicionarAresta(3, 4, 3)
 
-caminhoMinimo = grafo.dijkstra(0)  # partindo do vértice 0, encontre o caminho mínimo
+distancias, caminhoMinimo = grafo.dijkstra(0)  # partindo do vértice 0, encontre o caminho mínimo
+# cam = grafo.reconstructPath(0, distancias)  # reconstrua o caminho mínimo
+print(caminhoMinimo)
+print(distancias)
 
 grafo.mostraGrafo()
 
@@ -91,5 +96,5 @@ grafo.mostraGrafo()
 grafo.plotarGrafo()
 
 print(f"\nCaminho Mínimo partindo do vértice 0 e len(caminhoMinimo) = {len(caminhoMinimo)}: ")
-for i in range(len(caminhoMinimo)):
-    print(f"{caminhoMinimo[i]}", end=" ")
+for i in range(len(distancias)):
+    print(f"{distancias[i]}", end=" ")
