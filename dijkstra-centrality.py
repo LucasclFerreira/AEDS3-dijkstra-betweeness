@@ -4,16 +4,16 @@ import matplotlib.pyplot as plt
 
 class Grafo:
     def __init__(self, numVertices):
-        self.__numVertices = numVertices
-        self.__matAdj = [[sys.maxsize if i != j else 0 for j in range(numVertices)] for i in range(numVertices)]
+        self.numVertices = numVertices
+        self.matAdj = [[sys.maxsize if i != j else 0 for j in range(numVertices)] for i in range(numVertices)]
 
     @property
     def numVertices(self):
-        return self.__numVertices
+        return self._numVertices
 
-    # @numVertices.setter
-    # def numVertices(self, numVertices):
-    #     self.__numVertices = numVertices
+    @numVertices.setter
+    def numVertices(self, numVertices):
+        self._numVertices = numVertices
 
     def adicionarAresta(self, verticeA, verticeB, peso):
         self.__matAdj[verticeA][verticeB] = peso
@@ -26,7 +26,7 @@ class Grafo:
         visitados = [False for _ in range(self.numVertices)]
         distancias = [float('inf') for _ in range(self.numVertices)]
         distancias[posicao] = 0
-        caminhoMinimo = [999 for _ in range(self.numVertices)]
+        caminhoMinimo = [sys.maxsize for _ in range(self.numVertices)]
         caminhoMinimo[0] = posicao
 
         for i in range(self.numVertices):
