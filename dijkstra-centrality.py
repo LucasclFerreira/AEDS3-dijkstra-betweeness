@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 class Grafo:
     def __init__(self, numVertices):
         self.numVertices = numVertices
-        self.matAdj = [[sys.maxsize if i != j else 0 for j in range(numVertices)] for i in range(numVertices)]
+        self.matAdj = [[sys.maxsize for _ in range(self.numVertices)] for _ in range(self.numVertices)]
 
     @property
     def numVertices(self):
@@ -30,12 +30,12 @@ class Grafo:
     def removerAresta(self, verticeA, verticeB):
         self._matAdj[verticeA][verticeB] = sys.maxsize
 
-    def dijkstra(self, posicao):
+    def dijkstra(self, origem):
         visitados = [False for _ in range(self.numVertices)]
         distancias = [float('inf') for _ in range(self.numVertices)]
-        distancias[posicao] = 0
-        caminhoMinimo = [sys.maxsize for _ in range(self.numVertices)]
-        caminhoMinimo[0] = posicao
+        distancias[origem] = 0
+        antecessores = [sys.maxsize for _ in range(self.numVertices)]
+        antecessores[origem] = origem
 
         for i in range(self.numVertices):
             verticeAtual = -1
@@ -47,12 +47,21 @@ class Grafo:
                 if self._matAdj[verticeAtual][j] != sys.maxsize:
                     novaDistancia = distancias[verticeAtual] + self._matAdj[verticeAtual][j]
                     if novaDistancia < distancias[j]:
-                        if j < caminhoMinimo[i + 1] or novaDistancia < distancias[caminhoMinimo[i + 1]]:
-                            caminhoMinimo[i + 1] = j
+                        antecessores[j] = verticeAtual
                         distancias[j] = novaDistancia
-        return distancias, caminhoMinimo
+        return distancias, antecessores
 
-
+    def encontraCaminhoMinimo(self, origem, destino):
+        distancias, antecessores = self.dijkstra(origem)
+        caminho = []
+        if distancias[destino] == sys.maxsize:
+            return caminho
+        atual = destino
+        while atual != origem:
+            caminho.append(atual)
+            atual = antecessores[atual]
+        caminho.reverse()
+        return caminho
 
     def mostraGrafo(self):
         print("    ", end="")
@@ -95,16 +104,13 @@ grafo.adicionarAresta(2, 1, 2)
 grafo.adicionarAresta(2, 3, 5)
 grafo.adicionarAresta(3, 4, 3)
 
-distancias, caminhoMinimo = grafo.dijkstra(0)  # partindo do vértice 0, encontre o caminho mínimo
-# cam = grafo.reconstructPath(0, distancias)  # reconstrua o caminho mínimo
-print(caminhoMinimo)
-print(distancias)
+origem = 1
+destino = 4
+caminhoMinimo = grafo.encontraCaminhoMinimo(origem, destino)
+print(f"\nCaminho minimo PARTINDO de ({origem}) PARA ({destino}): {caminhoMinimo}\n")
+
 
 grafo.mostraGrafo()
 
 #Plotando o grafo
 grafo.plotarGrafo()
-
-print(f"\nCaminho Mínimo partindo do vértice 0 e len(caminhoMinimo) = {len(caminhoMinimo)}: ")
-for i in range(len(distancias)):
-    print(f"{distancias[i]}", end=" ")
