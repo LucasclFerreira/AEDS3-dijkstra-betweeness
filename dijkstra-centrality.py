@@ -62,6 +62,20 @@ class Grafo:
             atual = antecessores[atual]
         caminho.reverse()
         return caminho
+    
+    def betweeness(self):
+        betweeness = [0.0 for _ in range(self.numVertices)]
+        for i in range(self.numVertices):
+            for j in range(self.numVertices):
+                cam = self.encontraCaminhoMinimo(i, j)
+                if len(cam) != 0:
+                    
+                    for v in range(len(cam) - 1):
+                        betweeness[cam[v]] += 1
+        cont = self.numVertices * self.numVertices - 1
+        for i in range(self.numVertices):
+            betweeness[i] /= cont
+        return betweeness
 
     def mostraGrafo(self):
         print("    ", end="")
@@ -108,6 +122,18 @@ origem = 1
 destino = 4
 caminhoMinimo = grafo.encontraCaminhoMinimo(origem, destino)
 print(f"\nCaminho minimo PARTINDO de ({origem}) PARA ({destino}): {caminhoMinimo}\n")
+print("Betweeness implementado =", grafo.betweeness())
+
+# o código abaixo serve apenas para comparar os resultados do betweeness implementado e o da biblioteca NetworkX
+G = nx.DiGraph()
+G.add_edge(0, 1, weight=4)
+G.add_edge(0, 2, weight=1)
+G.add_edge(1, 3, weight=1)
+G.add_edge(2, 1, weight=2)
+G.add_edge(2, 3, weight=5)
+G.add_edge(3, 4, weight=3)
+betweenness_centrality = nx.betweenness_centrality(G, weight='weight')
+print("Betweenness do NetworkX =", betweenness_centrality)
 
 
 grafo.mostraGrafo()
