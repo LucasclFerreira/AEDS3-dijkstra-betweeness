@@ -1,4 +1,5 @@
 import sys
+import heapq
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -31,17 +32,19 @@ class Grafo:
         self._matAdj[verticeA][verticeB] = sys.maxsize
 
     def dijkstra(self, origem):
-        visitados = [False for _ in range(self.numVertices)]
-        distancias = [float('inf') for _ in range(self.numVertices)]
-        distancias[origem] = 0
+        distancias = [sys.maxsize for _ in range(self.numVertices)]
         antecessores = [sys.maxsize for _ in range(self.numVertices)]
+        visitados = [False for _ in range(self.numVertices)]
+
+        distancias[origem] = 0
         antecessores[origem] = origem
 
-        for i in range(self.numVertices):
-            verticeAtual = -1
-            for j in range(self.numVertices):
-                if not visitados[j] and (verticeAtual == -1 or distancias[j] < distancias[verticeAtual]):
-                    verticeAtual = j
+        heap = [(0, origem)]
+
+        while heap:
+            _, verticeAtual = heapq.heappop(heap)
+            if visitados[verticeAtual]:
+                continue
             visitados[verticeAtual] = True
             for j in range(self.numVertices):
                 if self._matAdj[verticeAtual][j] != sys.maxsize:
@@ -49,6 +52,7 @@ class Grafo:
                     if novaDistancia < distancias[j]:
                         antecessores[j] = verticeAtual
                         distancias[j] = novaDistancia
+                        heapq.heappush(heap, (novaDistancia, j))
         return distancias, antecessores
 
     def encontraCaminhoMinimo(self, origem, destino):
