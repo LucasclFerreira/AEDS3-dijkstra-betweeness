@@ -1,7 +1,9 @@
 import sys
 import heapq
 import networkx as nx
+import matplotlib.cm as cm
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 
 class Grafo:
     def __init__(self, numVertices):
@@ -76,7 +78,7 @@ class Grafo:
                     
                     for v in range(len(cam) - 1):
                         betweeness[cam[v]] += 1
-        cont = self.numVertices * self.numVertices - 1
+        cont = (self.numVertices * self.numVertices - 1) / 2
         for i in range(self.numVertices):
             betweeness[i] /= cont
         return betweeness
@@ -89,56 +91,68 @@ class Grafo:
         for i in range(self.numVertices):
             print(f" {i}: ", end="")
             for j in range(self.numVertices):
-                if (self._matAdj[i][j] == sys.maxsize):
+                if (self.matAdj[i][j] == sys.maxsize):
                     print(f"{0:>3}", end=" ")
                 else:
-                    print(f"{self._matAdj[i][j]:>3}", end=" ")
+                    print(f"{self.matAdj[i][j]:>3}", end=" ")
             print("")
 
     def plotarGrafo(self):
         G = nx.Graph()
-        numVertices = len(grafo._matAdj)
-        numvertices = grafo.numVertices
-        G.add_nodes_from(range(numvertices))
+        numVertices = self.numVertices
+        G.add_nodes_from(range(numVertices))
 
-        for i in range(numvertices):
-            for j in range(i + 1, numvertices):
-                weight = grafo._matAdj[i][j]
+        for i in range(numVertices):
+            for j in range(i + 1, numVertices):
+                weight = self.matAdj[i][j]
                 if weight != sys.maxsize:
-                    G.add_edge(i, j, weight=weight)
+                    G.add_edge(i, j)
 
-        pos = nx.spring_layout(G)  # Layout para posicionar os nós
-        edge_labels = nx.get_edge_attributes(G, 'weight')  # Rótulos das arestas
-        nx.draw_networkx(G, pos)
-        nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+        # Calcula o grau de cada vértice
+        graus = G.degree()
+
+        # Obtém os valores de grau para normalização
+        valores_grau = [graus[i] for i in range(numVertices)]
+        max_grau = max(valores_grau)
+        min_grau = min(valores_grau)
+
+        # Define uma escala de cores personalizada
+        cmap = cm.get_cmap('coolwarm')  # Escolha uma escala de cores, como 'coolwarm'
+
+        # Normaliza os valores de grau entre 0 e 1
+        norm = colors.Normalize(vmin=min_grau, vmax=max_grau)
+
+        # Mapeia os valores de grau normalizados para cores
+        cores = [cmap(norm(graus[i])) for i in range(numVertices)]
+
+        pos = nx.spring_layout(G)
+        nx.draw_networkx(G, pos, node_color=cores, node_size=800)
         plt.axis('off')
         plt.show()
 
-grafo = Grafo(5)
-grafo.adicionarAresta(0, 1, 4)
-grafo.adicionarAresta(0, 2, 1)
-grafo.adicionarAresta(1, 3, 1)
-grafo.adicionarAresta(2, 1, 2)
-grafo.adicionarAresta(2, 3, 5)
-grafo.adicionarAresta(3, 4, 3)
 
+def ler_arquivo_grafo(nome_arquivo, numero_vertices):
+    grafo = Grafo(numero_vertices)
+    with open(nome_arquivo, 'r') as arquivo:
+        for linha in arquivo:
+            dados = linha.strip().split(',')
+            vertice1 = int(dados[0])
+            vertice2 = int(dados[1])
+            peso = int(dados[2])
+            grafo.adicionarAresta(vertice1, vertice2, peso)
+    return grafo
+
+# altere o numero de vertices para o codigo não quebrar
+grafo = ler_arquivo_grafo('grafo4.txt', 5)
+
+# teste para ver se caminho minimo funciona
 origem = 1
 destino = 4
 caminhoMinimo = grafo.encontraCaminhoMinimo(origem, destino)
 print(f"\nCaminho minimo PARTINDO de ({origem}) PARA ({destino}): {caminhoMinimo}\n")
+
+# betweeness com todos os caminhos minimos
 print("Betweeness implementado =", grafo.betweeness())
-
-# o código abaixo serve apenas para comparar os resultados do betweeness implementado e o da biblioteca NetworkX
-G = nx.DiGraph()
-G.add_edge(0, 1, weight=4)
-G.add_edge(0, 2, weight=1)
-G.add_edge(1, 3, weight=1)
-G.add_edge(2, 1, weight=2)
-G.add_edge(2, 3, weight=5)
-G.add_edge(3, 4, weight=3)
-betweenness_centrality = nx.betweenness_centrality(G, weight='weight')
-print("Betweenness do NetworkX =", betweenness_centrality)
-
 
 grafo.mostraGrafo()
 
