@@ -97,7 +97,7 @@ class Grafo:
                     print(f"{self.matAdj[i][j]:>3}", end=" ")
             print("")
 
-    def plotarGrafo(self):
+    def plotarGrafo(self, betweeness):
         G = nx.Graph()
         numVertices = self.numVertices
         G.add_nodes_from(range(numVertices))
@@ -108,22 +108,19 @@ class Grafo:
                 if weight != sys.maxsize:
                     G.add_edge(i, j)
 
-        # Calcula o grau de cada vértice
-        graus = G.degree()
+        # Obtém os valores de centralidade betweenness para normalização
+        valores_centralidade = betweeness
+        max_centralidade = max(valores_centralidade)
+        min_centralidade = min(valores_centralidade)
 
-        # Obtém os valores de grau para normalização
-        valores_grau = [graus[i] for i in range(numVertices)]
-        max_grau = max(valores_grau)
-        min_grau = min(valores_grau)
+        # Define uma escala de cores "Reds"
+        cmap = cm.get_cmap('coolwarm')
 
-        # Define uma escala de cores personalizada
-        cmap = cm.get_cmap('coolwarm')  # Escolha uma escala de cores, como 'coolwarm'
+        # Normaliza os valores de centralidade betweenness entre 0 e 1
+        norm = colors.Normalize(vmin=min_centralidade, vmax=max_centralidade)
 
-        # Normaliza os valores de grau entre 0 e 1
-        norm = colors.Normalize(vmin=min_grau, vmax=max_grau)
-
-        # Mapeia os valores de grau normalizados para cores
-        cores = [cmap(norm(graus[i])) for i in range(numVertices)]
+        # Mapeia os valores de centralidade normalizados para cores
+        cores = [cmap(norm(betweeness[i])) for i in range(numVertices)]
 
         pos = nx.spring_layout(G)
         nx.draw_networkx(G, pos, node_color=cores, node_size=800)
@@ -152,9 +149,10 @@ caminhoMinimo = grafo.encontraCaminhoMinimo(origem, destino)
 print(f"\nCaminho minimo PARTINDO de ({origem}) PARA ({destino}): {caminhoMinimo}\n")
 
 # betweeness com todos os caminhos minimos
-print("Betweeness implementado =", grafo.betweeness())
+betweeness = grafo.betweeness()
+print("Betweeness implementado =", betweeness)
 
 grafo.mostraGrafo()
 
 #Plotando o grafo
-grafo.plotarGrafo()
+grafo.plotarGrafo(betweeness)
