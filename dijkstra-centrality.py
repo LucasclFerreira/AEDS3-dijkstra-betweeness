@@ -108,22 +108,25 @@ class Grafo:
                 if weight != sys.maxsize:
                     G.add_edge(i, j)
 
-        # Obtém os valores de centralidade betweenness para normalização
         valores_centralidade = betweeness
         max_centralidade = max(valores_centralidade)
         min_centralidade = min(valores_centralidade)
 
-        # Define uma escala de cores "Reds"
         cmap = cm.get_cmap('coolwarm')
 
-        # Normaliza os valores de centralidade betweenness entre 0 e 1
         norm = colors.Normalize(vmin=min_centralidade, vmax=max_centralidade)
 
-        # Mapeia os valores de centralidade normalizados para cores
         cores = [cmap(norm(betweeness[i])) for i in range(numVertices)]
 
+        cor_vertices = []
+
+        for i in range(numVertices):
+            cor_proporcional = 1.0 - (betweeness[i] - min_centralidade) / (max_centralidade - min_centralidade)
+            r, g, b, _ = cmap(cor_proporcional)
+            cor_vertices.append((r, g, b))
+
         pos = nx.spring_layout(G)
-        nx.draw_networkx(G, pos, node_color=cores, node_size=800)
+        nx.draw_networkx(G, pos, node_color=cor_vertices, node_size=800)
         plt.axis('off')
         plt.show()
 
