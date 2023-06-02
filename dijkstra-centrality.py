@@ -36,18 +36,13 @@ class Grafo:
     def dijkstra(self, origem):
         distancias = [sys.maxsize for _ in range(self.numVertices)]
         antecessores = [sys.maxsize for _ in range(self.numVertices)]
-        visitados = [False for _ in range(self.numVertices)]
 
         distancias[origem] = 0
         antecessores[origem] = origem
-
         heap = [(0, origem)]
 
         while heap:
             _, verticeAtual = heapq.heappop(heap)
-            if visitados[verticeAtual]:
-                continue
-            visitados[verticeAtual] = True
             for j in range(self.numVertices):
                 if self._matAdj[verticeAtual][j] != sys.maxsize:
                     novaDistancia = distancias[verticeAtual] + self._matAdj[verticeAtual][j]
@@ -111,13 +106,7 @@ class Grafo:
         valores_centralidade = betweeness
         max_centralidade = max(valores_centralidade)
         min_centralidade = min(valores_centralidade)
-
         cmap = cm.get_cmap('coolwarm')
-
-        norm = colors.Normalize(vmin=min_centralidade, vmax=max_centralidade)
-
-        cores = [cmap(norm(betweeness[i])) for i in range(numVertices)]
-
         cor_vertices = []
 
         for i in range(numVertices):
@@ -146,7 +135,7 @@ def ler_arquivo_grafo(nome_arquivo, numero_vertices):
 grafo = ler_arquivo_grafo('grafo4.txt', 5)
 
 # teste para ver se caminho minimo funciona
-origem = 1
+origem = 2
 destino = 4
 caminhoMinimo = grafo.encontraCaminhoMinimo(origem, destino)
 print(f"\nCaminho minimo PARTINDO de ({origem}) PARA ({destino}): {caminhoMinimo}\n")
